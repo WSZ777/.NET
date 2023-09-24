@@ -1,0 +1,14 @@
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\bin\Debug\net6.0\BankSimulation.exe
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\bin\Debug\net6.0\BankSimulation.deps.json
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\bin\Debug\net6.0\BankSimulation.runtimeconfig.json
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\bin\Debug\net6.0\BankSimulation.dll
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\bin\Debug\net6.0\BankSimulation.pdb
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.AssemblyInfoInputs.cache
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.AssemblyInfo.cs
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.csproj.CoreCompileInputs.cache
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.dll
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\refint\BankSimulation.dll
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.pdb
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\BankSimulation.genruntimeconfig.cache
+C:\Users\86182\source\repos\BankSimulation\BankSimulation\obj\Debug\net6.0\ref\BankSimulation.dll
