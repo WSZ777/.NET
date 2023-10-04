@@ -1,0 +1,16 @@
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.Form1.resources
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.csproj.GenerateResource.cache
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.AssemblyInfoInputs.cache
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.AssemblyInfo.cs
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.csproj.CoreCompileInputs.cache
+C:\Users\86182\source\repos\第三次作业\第三次作业\bin\Debug\net6.0-windows\第三次作业.exe
+C:\Users\86182\source\repos\第三次作业\第三次作业\bin\Debug\net6.0-windows\第三次作业.deps.json
+C:\Users\86182\source\repos\第三次作业\第三次作业\bin\Debug\net6.0-windows\第三次作业.runtimeconfig.json
+C:\Users\86182\source\repos\第三次作业\第三次作业\bin\Debug\net6.0-windows\第三次作业.dll
+C:\Users\86182\source\repos\第三次作业\第三次作业\bin\Debug\net6.0-windows\第三次作业.pdb
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.dll
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\refint\第三次作业.dll
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.pdb
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\第三次作业.genruntimeconfig.cache
+C:\Users\86182\source\repos\第三次作业\第三次作业\obj\Debug\net6.0-windows\ref\第三次作业.dll
