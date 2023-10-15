@@ -1,0 +1,16 @@
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.Form1.resources
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.csproj.GenerateResource.cache
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.AssemblyInfoInputs.cache
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.AssemblyInfo.cs
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.csproj.CoreCompileInputs.cache
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\bin\Debug\net6.0-windows\FileBrowser.exe
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\bin\Debug\net6.0-windows\FileBrowser.deps.json
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\bin\Debug\net6.0-windows\FileBrowser.runtimeconfig.json
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\bin\Debug\net6.0-windows\FileBrowser.dll
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\bin\Debug\net6.0-windows\FileBrowser.pdb
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.dll
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\refint\FileBrowser.dll
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.pdb
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\FileBrowser.genruntimeconfig.cache
+C:\Users\86182\source\repos\FileBrowser\FileBrowser\obj\Debug\net6.0-windows\ref\FileBrowser.dll
