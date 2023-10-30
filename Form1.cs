@@ -1,127 +1,267 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Data;
+using System.Data.SQLite;
 using System.Windows.Forms;
 
-namespace ç¬¬äº”æ¬¡ä½œä¸š
+namespace StudentManagementSystem
 {
     public partial class Form1 : Form
     {
-        private static readonly object lockObject = new object();
-
-        private List<string> crawledUrls;
+        private SQLiteConnection connection;
         public Form1()
         {
             InitializeComponent();
-            crawledUrls = new List<string>();
+            InitializeDatabase();
+            LoadSchools();
         }
 
-        private async void searchButton_Click(object sender, EventArgs e)
+        private void InitializeDatabase()
         {
-            System.Diagnostics.Debug.WriteLine("æœç´¢æŒ‰é’®è¢«ç‚¹å‡»");
+            // Á¬½Óµ½SQLiteÊı¾İ¿â
+            connection = new SQLiteConnection("Data Source=student.db;Version=3;");
+            connection.Open();
 
-            string keyword = keywordTextBox.Text;
+            // ´´½¨School±í
+            string createSchoolTableQuery = "CREATE TABLE IF NOT EXISTS School (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Address TEXT)";
+            SQLiteCommand createSchoolTableCommand = new SQLiteCommand(createSchoolTableQuery, connection);
+            createSchoolTableCommand.ExecuteNonQuery();
 
-            crawledUrls.Clear();
-            crawledUrlsListBox.Items.Clear();
+            // ´´½¨Class±í
+            string createClassTableQuery = "CREATE TABLE IF NOT EXISTS Class (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Grade TEXT, SchoolId INTEGER)";
+            SQLiteCommand createClassTableCommand = new SQLiteCommand(createClassTableQuery, connection);
+            createClassTableCommand.ExecuteNonQuery();
 
-            await Crawl(keyword);
-        }
-        private async Task Crawl(string keyword)
-        {
-            // ä½¿ç”¨æœç´¢å¼•æ“æœç´¢å…³é”®å­—ï¼Œå¹¶è·å–æœç´¢ç»“æœé¡µé¢çš„URLåˆ—è¡¨
-            List<string> searchResults = await SearchEngine.Search(keyword);
+            // ´´½¨Student±í
+            string createStudentTableQuery = "CREATE TABLE IF NOT EXISTS Student (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Age INTEGER, Gender TEXT, ClassId INTEGER)";
+            SQLiteCommand createStudentTableCommand = new SQLiteCommand(createStudentTableQuery, connection);
+            createStudentTableCommand.ExecuteNonQuery();
 
-            // åˆ›å»ºä»»åŠ¡åˆ—è¡¨ï¼Œç”¨äºå¹¶è¡Œå¤„ç†æ¯ä¸ªæœç´¢ç»“æœé¡µé¢
-            List<Task> tasks = new List<Task>();
-
-            foreach (string url in searchResults)
-            {
-                // å¯åŠ¨ä»»åŠ¡ï¼Œçˆ¬å–æ¯ä¸ªæœç´¢ç»“æœé¡µé¢ä¸Šçš„ç”µè¯å·ç 
-                tasks.Add(Task.Run(() => CrawlPage(url)));
-            }
-
-            // ç­‰å¾…æ‰€æœ‰ä»»åŠ¡å®Œæˆ
-            await Task.WhenAll(tasks);
-
-            // æ˜¾ç¤ºçˆ¬å–çš„URL
-            foreach (string url in crawledUrls)
-            {
-                crawledUrlsListBox.Items.Add(url);
-            }
+            // ´´½¨Log±í
+            string createLogTableQuery = "CREATE TABLE IF NOT EXISTS Log (Id INTEGER PRIMARY KEY AUTOINCREMENT, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, Action TEXT)";
+            SQLiteCommand createLogTableCommand = new SQLiteCommand(createLogTableQuery, connection);
+            createLogTableCommand.ExecuteNonQuery();
         }
 
-        private void CrawlPage(string url)
+        private void LoadSchools()
         {
-            // ä¸‹è½½ç½‘é¡µå†…å®¹
-            string html = DownloadHtml(url);
-            Console.WriteLine("çˆ¬è™«ä¸­" + url);
-            // ä½¿ç”¨æ­£åˆ™è¡¨è¾¾å¼åŒ¹é…ç”µè¯å·ç 
-            List<string> phoneNumbers = ExtractPhoneNumbers(html);
+            // ²éÑ¯ËùÓĞÑ§Ğ£
+            string query = "SELECT * FROM School";
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, connection);
+            DataTable table = new DataTable();
+            adapter.Fill(table);
 
-            // è®°å½•ç”µè¯å·ç åŠå…¶å¯¹åº”çš„URL
-            foreach (string phoneNumber in phoneNumbers)
+            // °ó¶¨Ñ§Ğ£ÁĞ±íµ½TreeView¿Ø¼şÉÏ
+            schoolTreeView.Nodes.Clear();
+            foreach (DataRow row in table.Rows)
             {
-                lock (lockObject)
-                {
-                    if (!crawledUrls.Contains(phoneNumber))
-                    {
-                        crawledUrls.Add(phoneNumber + " - " + url);
-                    }
-                }
+                int schoolId = Convert.ToInt32(row["Id"]);
+                string schoolName = row["Name"].ToString();
+                string schoolAddress = row["Address"].ToString();
+
+                TreeNode schoolNode = new TreeNode(schoolName);
+                schoolNode.Tag = schoolId;
+
+                LoadClasses(schoolNode);
+
+                schoolTreeView.Nodes.Add(schoolNode);
             }
         }
 
-        private string DownloadHtml(string url)
+        private void LoadClasses(TreeNode schoolNode)
         {
-            using (WebClient client = new())
+            int schoolId = Convert.ToInt32(schoolNode.Tag);
+
+            // ²éÑ¯Ö¸¶¨Ñ§Ğ£µÄ°à¼¶
+            string query = "SELECT * FROM Class WHERE SchoolId = @SchoolId";
+            SQLiteCommand command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@SchoolId", schoolId);
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+            DataTable table = new DataTable();
+            adapter.Fill(table);
+
+            // °ó¶¨°à¼¶ÁĞ±íµ½Ñ§Ğ£½ÚµãÏÂµÄ×Ó½ÚµãÉÏ
+            schoolNode.Nodes.Clear();
+            foreach (DataRow row in table.Rows)
             {
-                return client.DownloadString(url);
+                int classId = Convert.ToInt32(row["Id"]);
+                string className = row["Name"].ToString();
+                string classGrade = row["Grade"].ToString();
+
+                TreeNode classNode = new TreeNode(className + " (" + classGrade + ")");
+                classNode.Tag = classId;
+
+                LoadStudents(classNode);
+
+                schoolNode.Nodes.Add(classNode);
             }
         }
 
-        private List<string> ExtractPhoneNumbers(string html)
+        private void LoadStudents(TreeNode classNode)
         {
-            List<string> phoneNumbers = new List<string>();
+            int classId = Convert.ToInt32(classNode.Tag);
 
-            // ä½¿ç”¨æ­£åˆ™è¡¨è¾¾å¼åŒ¹é…ç”µè¯å·ç ï¼ˆç¤ºä¾‹æ­£åˆ™è¡¨è¾¾å¼å¯èƒ½ä¸å®Œå–„ï¼Œè¯·æ ¹æ®å®é™…æƒ…å†µä¿®æ”¹ï¼‰
-            Regex regex = new Regex(@"\d{11}");
-            MatchCollection matches = regex.Matches(html);
+            // ²éÑ¯Ö¸¶¨°à¼¶µÄÑ§Éú
+            string query = "SELECT * FROM Student WHERE ClassId = @ClassId";
+            SQLiteCommand command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@ClassId", classId);
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+            DataTable table = new DataTable();
+            adapter.Fill(table);
 
-            foreach (Match match in matches)
+            // °ó¶¨Ñ§ÉúÁĞ±íµ½°à¼¶½ÚµãÏÂµÄ×Ó½ÚµãÉÏ
+            classNode.Nodes.Clear();
+            foreach (DataRow row in table.Rows)
             {
-                phoneNumbers.Add(match.Value);
+                int studentId = Convert.ToInt32(row["Id"]);
+                string studentName = row["Name"].ToString();
+                int studentAge = Convert.ToInt32(row["Age"]);
+                string studentGender = row["Gender"].ToString();
+
+                TreeNode studentNode = new TreeNode(studentName + " (" + studentAge + ", " + studentGender + ")");
+                studentNode.Tag = studentId;
+
+                classNode.Nodes.Add(studentNode);
             }
-
-            return phoneNumbers;
         }
-    }
 
-    public static class SearchEngine
-    {
-        public static Task<List<string>> Search(string keyword)
+        private void addSchoolButton_Click(object sender, EventArgs e)
         {
-            // ä½¿ç”¨æœç´¢å¼•æ“æœç´¢å…³é”®å­—ï¼Œè¿”å›æœç´¢ç»“æœé¡µé¢çš„URLåˆ—è¡¨
-            // åœ¨æ­¤ä½¿ç”¨å¼‚æ­¥æ–¹æ³•æ¨¡æ‹Ÿæœç´¢è¿‡ç¨‹
-            return Task.Run(() =>
-            {
-                List<string> searchResults = new List<string>();
+            string schoolName = schoolNameTextBox.Text;
+            string schoolAddress = schoolAddressTextBox.Text;
 
-                // æ¨¡æ‹Ÿæœç´¢è¿‡ç¨‹...
-                for (int i = 1; i <= 10; i++)
-                {
-                    string url = $"https://www.baidu.com/?tn=62095104_27_oem_dg&ch=1={keyword}&page={i}";
-                    searchResults.Add(url);
-                }
+            // ²åÈëÑ§Ğ£ĞÅÏ¢µ½Êı¾İ¿â
+            string insertQuery = "INSERT INTO School (Name, Address) VALUES (@Name, @Address)";
+            SQLiteCommand command = new SQLiteCommand(insertQuery, connection);
+            command.Parameters.AddWithValue("@Name", schoolName);
+            command.Parameters.AddWithValue("@Address", schoolAddress);
+            command.ExecuteNonQuery();
 
-                // æ¨¡æ‹Ÿæœç´¢å»¶è¿Ÿ
-                Thread.Sleep(2000);
+            // Ìí¼Ó²Ù×÷¼ÇÂ¼µ½Log±í
+            string logMessage = "Ìí¼ÓÑ§Ğ££º" + schoolName;
+            LogAction(logMessage);
 
-                return searchResults;
-            });
+            LoadSchools();
         }
+
+        private void addClassButton_Click(object sender, EventArgs e)
+        {
+            string className = classNameTextBox.Text;
+            string classGrade = classGradeTextBox.Text;
+            int schoolId = Convert.ToInt32(schoolTreeView.SelectedNode.Tag);
+
+            // ²åÈë°à¼¶ĞÅÏ¢µ½Êı¾İ¿â
+            string insertQuery = "INSERT INTO Class (Name, Grade, SchoolId) VALUES (@Name, @Grade, @SchoolId)";
+            SQLiteCommand command = new SQLiteCommand(insertQuery, connection);
+            command.Parameters.AddWithValue("@Name", className);
+            command.Parameters.AddWithValue("@Grade", classGrade);
+            command.Parameters.AddWithValue("@SchoolId", schoolId);
+            command.ExecuteNonQuery();
+
+            // Ìí¼Ó²Ù×÷¼ÇÂ¼µ½Log±í
+            string logMessage = "Ìí¼Ó°à¼¶£º" + className;
+            LogAction(logMessage);
+
+            LoadClasses(schoolTreeView.SelectedNode);
+        }
+
+        private void addStudentButton_Click(object sender, EventArgs e)
+        {
+            string studentName = studentNameTextBox.Text;
+            int studentAge = Convert.ToInt32(studentAgeTextBox.Text);
+            string studentGender = studentGenderTextBox.Text;
+            int classId = Convert.ToInt32(schoolTreeView.SelectedNode.Tag);
+
+            // ²åÈëÑ§ÉúĞÅÏ¢µ½Êı¾İ¿â
+            string insertQuery = "INSERT INTO Student (Name, Age, Gender, ClassId) VALUES (@Name, @Age, @Gender, @ClassId)";
+            SQLiteCommand command = new SQLiteCommand(insertQuery, connection);
+            command.Parameters.AddWithValue("@Name", studentName);
+            command.Parameters.AddWithValue("@Age", studentAge);
+            command.Parameters.AddWithValue("@Gender", studentGender);
+            command.Parameters.AddWithValue("@ClassId", classId);
+            command.ExecuteNonQuery();
+
+            // Ìí¼Ó²Ù×÷¼ÇÂ¼µ½Log±í
+            string logMessage = "Ìí¼ÓÑ§Éú£º" + studentName;
+            LogAction(logMessage);
+
+            LoadStudents(schoolTreeView.SelectedNode);
+        }
+
+        private void deleteSchoolButton_Click(object sender, EventArgs e)
+        {
+            int schoolId = Convert.ToInt32(schoolTreeView.SelectedNode.Tag);
+
+            // É¾³ıÑ§Ğ£ĞÅÏ¢¼°Æä¹ØÁªµÄ°à¼¶ºÍÑ§ÉúĞÅÏ¢
+            string deleteQuery = "DELETE FROM School WHERE Id = @SchoolId";
+            SQLiteCommand command = new SQLiteCommand(deleteQuery, connection);
+            command.Parameters.AddWithValue("@SchoolId", schoolId);
+            command.ExecuteNonQuery();
+
+            // Ìí¼Ó²Ù×÷¼ÇÂ¼µ½Log±í
+            string logMessage = "É¾³ıÑ§Ğ££º" + schoolTreeView.SelectedNode.Text;
+            LogAction(logMessage);
+
+            LoadSchools();
+        }
+
+        private void deleteClassButton_Click(object sender, EventArgs e)
+        {
+            int classId = Convert.ToInt32(schoolTreeView.SelectedNode.Tag);
+
+            // É¾³ı°à¼¶ĞÅÏ¢¼°Æä¹ØÁªµÄÑ§ÉúĞÅÏ¢
+            string deleteQuery = "DELETE FROM Class WHERE Id = @ClassId";
+            SQLiteCommand command = new SQLiteCommand(deleteQuery, connection);
+            command.Parameters.AddWithValue("@ClassId", classId);
+            command.ExecuteNonQuery();
+
+            // Ìí¼Ó²Ù×÷¼ÇÂ¼µ½Log±í
+            string logMessage = "É¾³ı°à¼¶£º" + schoolTreeView.SelectedNode.Text;
+            LogAction(logMessage);
+            LoadSchools();
+        }
+
+        private void deleteStudentButton_Click(object sender, EventArgs e)
+        {
+            int studentId = Convert.ToInt32(schoolTreeView.SelectedNode.Tag);
+
+            // É¾³ıÑ§ÉúĞÅÏ¢
+            string deleteQuery = "DELETE FROM Student WHERE Id = @StudentId";
+            SQLiteCommand command = new SQLiteCommand(deleteQuery, connection);
+            command.Parameters.AddWithValue("@StudentId", studentId);
+            command.ExecuteNonQuery();
+
+            // Ìí¼Ó²Ù×÷¼ÇÂ¼µ½Log±í
+            string logMessage = "É¾³ıÑ§Éú£º" + schoolTreeView.SelectedNode.Text;
+            LogAction(logMessage);
+
+            LoadStudents(schoolTreeView.SelectedNode.Parent);
+        }
+
+        private void LogAction(string message)
+        {
+            // ²åÈë²Ù×÷¼ÇÂ¼µ½Log±í
+            string insertQuery = "INSERT INTO Log (Action) VALUES (@Action)";
+            SQLiteCommand command = new SQLiteCommand(insertQuery, connection);
+            command.Parameters.AddWithValue("@Action", message);
+            command.ExecuteNonQuery();
+        }
+
+        private void searchLogButton_Click(object sender, EventArgs e)
+        {
+            string keyword = searchLogTextBox.Text;
+
+            // ²éÑ¯Log±íÖĞ°üº¬¹Ø¼ü×ÖµÄ²Ù×÷¼ÇÂ¼
+            string query = "SELECT * FROM Log WHERE Action LIKE @Keyword";
+            SQLiteCommand command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@Keyword", "%" + keyword + "%");
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+            DataTable table = new DataTable();
+            adapter.Fill(table);
+
+            // ÔÚDataGridView¿Ø¼şÖĞÏÔÊ¾²éÑ¯½á¹û
+            logDataGridView.DataSource = table;
+        }
+
     }
 }

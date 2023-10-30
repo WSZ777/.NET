@@ -1,4 +1,4 @@
-namespace 第五次作业
+namespace StudentManagementSystem
 {
     internal static class Program
     {
